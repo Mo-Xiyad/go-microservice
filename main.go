@@ -1,26 +1,25 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"log"
 )
 
 
 func main() {
 	url := "https://catfact.ninja/fact"
- catFactService := NewCatFactService(url)
- catFact, err := catFactService.GetCatFact(context.TODO())
- if err != nil {
-	log.Fatal(err)
- }
+ 
+	catFactService := NewCatFactService(url)
+ catFactService = NewLoggingService(catFactService)
+ 
+ apiServer := NewApiServer(catFactService)
+ err := apiServer.Start(":8080")
 
- fmt.Println(catFact.Fact)
+ log.Fatal(err)
 
 qrService := NewQRCodeService() 
 err = qrService.GenerateQRCode(url, "cat-fact.png")
 if err != nil {
     log.Fatal("Failed to generate QR code:", err)
 }
-
+log.Println("QR code generated!")
 }
